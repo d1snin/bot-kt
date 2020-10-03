@@ -1,4 +1,6 @@
+import helpers.ShellHelper.bash
 import net.ayataka.kordis.entity.message.Message
+import java.io.IOException
 
 object Send {
     fun log(message: String) = println("[bot-kt] $message")
@@ -41,6 +43,20 @@ object Send {
             title = "Error"
             description = "```" + e.message + "```\n```" + e.stackTrace.joinToString("\n") + "```"
             color = Colors.error
+        }
+    }
+
+    /**
+     * Run a command and send the stdout / stderr to the channel
+     * @return false if command errored
+     */
+    suspend fun String.bash(message: Message): Boolean {
+        return try {
+            message.normal(this.bash())
+            true
+        } catch (e: IOException) {
+            message.stackTrace(e)
+            false
         }
     }
 }
